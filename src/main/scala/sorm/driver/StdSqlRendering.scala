@@ -16,14 +16,19 @@ trait StdSqlRendering {
           "DELETE FROM " + quote(table) +
           ( where.map(template).map("\n" + _).getOrElse("") 
           ).indent(2)
-        case Insert(table, columns, values) if columns.isEmpty && values.isEmpty =>
-          "INSERT INTO " + quote(table) + " VALUES (DEFAULT)"
-        case Insert(table, columns, values) =>
-          "INSERT INTO " + quote(table) +
-          ( "\n( " + columns.map(quote).mkString(", ") + " )" +
-            "\nVALUES" +
-            "\n( " + values.map(_ => "?").mkString(", ") + " )"
-          ).indent(2)
+        case Insert(table, columns, values, delayed) if columns.isEmpty && values.isEmpty => {
+          val delayed = if (delayed) "DELAYED" else ""
+          s"INSERT $delayed INTO " + quote(table) + " VALUES (DEFAULT)"
+        }
+        case Insert(table, columns, values, delayed) => {
+          val delayed = if (delayed) "DELAYED" else ""
+          s"INSERT $delayed INTO " + quote(table) +
+            ( "\n( " + columns.map(quote).mkString(", ") + " )" +
+              "\nVALUES" +
+              "\n( " + values.map(_ => "?").mkString(", ") + " )"
+              ).indent(2)
+        }
+
         case Update(table, exps, where) =>
           "UPDATE " + quote(table) +
           ( "\nSET " + exps.ensuring(_.nonEmpty).map(template).mkString(",\n").indent(4).trim +

@@ -32,7 +32,7 @@ trait DriverConnection {
   def insert
     ( table : String, values : Iterable[(String, Any)] )
   def insertAndGetGeneratedKeys
-    ( table : String, values : Iterable[(String, Any)] )
+    ( table : String, values : Iterable[(String, Any)], delayed: Boolean = false )
     : Seq[Any]
   def delete
     ( table : String, pk : Iterable[(String, Any)] )

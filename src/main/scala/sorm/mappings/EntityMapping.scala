@@ -51,7 +51,7 @@ class EntityMapping
           throw new SormException("Attempt to refer to an unpersisted entity: " + value)
       }
 
-  def save ( value : Any, connection : DriverConnection ) : Persisted
+  def save ( value : Any, connection : DriverConnection, delayed : Boolean = false ) : Persisted
     = {
       val propertyValues = properties.map{ case (n, m) => (n, m, reflection.propertyValue(n, value.asInstanceOf[AnyRef])) }.toStream
       val rowValues = propertyValues.flatMap{ case (n, m, v) => m.valuesForContainerTableRow(v) }
@@ -63,7 +63,7 @@ class EntityMapping
           propertyValues.foreach{ case (n, m, v) => m.update(v, pk, connection) }
           value
         case _ =>
-          val id = connection.insertAndGetGeneratedKeys(tableName, rowValues).ensuring(_.length == 1).head.asInstanceOf[Long]
+          val id = connection.insertAndGetGeneratedKeys(tableName, rowValues, delayed).ensuring(_.length == 1).head.asInstanceOf[Long]
           propertyValues.foreach{ case (n, m, v) => m.insert(v, Stream(id), connection) }
           Persisted( propertyValues.map(t => t._1 -> t._3).toMap, id, reflection )
       }

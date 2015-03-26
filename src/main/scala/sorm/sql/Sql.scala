@@ -4,7 +4,7 @@ sealed trait Sql
 object Sql {
 
   case class Insert
-    ( table : String, columns : Seq[String], values : Seq[Any] )
+    ( table : String, columns : Seq[String], values : Seq[Any], delayed : Boolean = false )
     extends Sql
 
   case class Update

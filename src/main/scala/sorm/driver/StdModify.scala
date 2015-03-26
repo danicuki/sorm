@@ -21,9 +21,9 @@ trait StdModify { self: StdConnection with StdStatement =>
     }
 
   def insertAndGetGeneratedKeys
-    ( table : String, values : Iterable[(String, Any)] )
+    ( table : String, values : Iterable[(String, Any)], delayed : Boolean = false )
     : Seq[Any]
-    = values.toStream.unzip $$ (Insert(table, _, _)) $ statement $ connection.executeUpdateAndGetGeneratedKeys $ (_.head)
+    = values.toStream.unzip $$ (Insert(table, _, _, delayed)) $ statement $ connection.executeUpdateAndGetGeneratedKeys $ (_.head)
 
   def delete
     ( table : String, pk : Iterable[(String, Any)] )

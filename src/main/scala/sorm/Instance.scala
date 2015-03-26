@@ -124,10 +124,10 @@ object Instance {
      */
     def save
       [ T <: AnyRef : TypeTag ]
-      ( value : T )
+      ( value : T, delayed : Boolean = false )
       : T with Persisted
       = connector.withConnection{ cx =>
-          mapping[T].save(value, cx).asInstanceOf[T with Persisted]
+          mapping[T].save(value, cx, delayed).asInstanceOf[T with Persisted]
         }
 
     /**
