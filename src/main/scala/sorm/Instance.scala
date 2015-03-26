@@ -124,11 +124,24 @@ object Instance {
      */
     def save
       [ T <: AnyRef : TypeTag ]
-      ( value : T, delayed : Boolean = false )
+      ( value : T )
       : T with Persisted
       = connector.withConnection{ cx =>
-          mapping[T].save(value, cx, delayed).asInstanceOf[T with Persisted]
+          mapping[T].save(value, cx, false).asInstanceOf[T with Persisted]
         }
+
+    /**
+     * Same as save, but uses INSERT DELAYED sql command.
+     * @param value The value to save
+     * @return The saved entity instance with a [[sorm.Persisted]] trait mixed in
+     */
+    def saveDelayed
+    [ T <: AnyRef : TypeTag ]
+    ( value : T )
+    : T with Persisted
+    = connector.withConnection{ cx =>
+      mapping[T].save(value, cx, true).asInstanceOf[T with Persisted]
+    }
 
     /**
      * Saves the entity by overwriting the existing one if one with the matching unique keys exists and creating a new one otherwise. Executing simply [[sorm.Instance.Api#save]] in a situation of unique keys clash would have thrown an exception. Beware that in case when not all unique keys are matched this method will still throw an exception.

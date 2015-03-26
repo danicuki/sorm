@@ -24,7 +24,7 @@ class EntityWithNoPrimitivesSuite extends FunSuite with ShouldMatchers {
       .whereEqual("id", 1)
       .fetchOne()
       .map(a => a.copy(genres = Set("rock","rnb"), a = Set("myfoo"), b = Set("mybar")))
-      .map(a => db.save(a, false))
+      .map(a => db.save(a))
 
     db.query[Artist].whereEqual("id", 1).fetchOne().map(_.b).shouldBe(Some(Set("mybar")))
   }
