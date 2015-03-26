@@ -46,7 +46,7 @@ class Postgres (protected val connection : JdbcConnection)
       }
     }
   //  dirty: implies that the only thing returned is an id column
-  override def insertAndGetGeneratedKeys(table: String, values: Iterable[(String, Any)])
+  override def insertAndGetGeneratedKeys(table: String, values: Iterable[(String, Any)], delayed: Boolean = false)
     = super.insertAndGetGeneratedKeys(table, values).take(1)
   override protected def template(sql: Sql) = sql match {
     case Sql.Regexp => "~*"

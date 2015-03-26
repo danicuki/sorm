@@ -17,12 +17,12 @@ trait StdSqlRendering {
           ( where.map(template).map("\n" + _).getOrElse("") 
           ).indent(2)
         case Insert(table, columns, values, delayed) if columns.isEmpty && values.isEmpty => {
-          val delayed = if (delayed) "DELAYED" else ""
-          s"INSERT $delayed INTO " + quote(table) + " VALUES (DEFAULT)"
+          val delayedStr = if (delayed) "DELAYED" else ""
+          s"INSERT $delayedStr INTO " + quote(table) + " VALUES (DEFAULT)"
         }
         case Insert(table, columns, values, delayed) => {
-          val delayed = if (delayed) "DELAYED" else ""
-          s"INSERT $delayed INTO " + quote(table) +
+          val delayedStr = if (delayed) "DELAYED" else ""
+          s"INSERT $delayedStr INTO " + quote(table) +
             ( "\n( " + columns.map(quote).mkString(", ") + " )" +
               "\nVALUES" +
               "\n( " + values.map(_ => "?").mkString(", ") + " )"
@@ -175,7 +175,7 @@ trait StdSqlRendering {
     = sql match {
         case Delete(table, where) =>
           where.toStream.flatMap(data)
-        case Insert(table, columns, values) =>
+        case Insert(table, columns, values, delayed) =>
           values.toStream
         case Update(table, exps, where) =>
           exps.flatMap(data) ++: where.toStream.flatMap(data)
