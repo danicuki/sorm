@@ -28,6 +28,28 @@ class EntityWithNoPrimitivesSuite extends FunSuite with ShouldMatchers {
 
     db.query[Artist].whereEqual("id", 1).fetchOne().map(_.b).shouldBe(Some(Set("mybar")))
   }
+
+  test("Save Delayed should work") {
+    val db = new Instance(
+      entities = Set(
+        Entity[Artist]()
+      ),
+      url = "jdbc:mysql://localhost/sorm_test",
+      user = "root",
+      password = "",
+      initMode = InitMode.DropAllCreate
+    )
+
+    db.saveDelayed(Artist(Set("metal"),Set("foo"),Set("bar")))
+
+    db.query[Artist]
+      .whereEqual("id", 1)
+      .fetchOne()
+      .map(a => a.copy(genres = Set("rock","rnb"), a = Set("myfoo"), b = Set("mybar")))
+      .map(a => db.save(a))
+
+    db.query[Artist].whereEqual("id", 1).fetchOne().map(_.b).shouldBe(Some(Set("mybar")))
+  }
 }
 object EntityWithNoPrimitivesSuite {
   case class Artist( genres: Set[String] , a: Set[String], b: Set[String] )
